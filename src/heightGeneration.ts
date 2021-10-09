@@ -24,7 +24,7 @@ const distanceToWall = Math.min(centerX, centerY);
 /** Simplex noise function. */
 const simplexNoise = makeNoise2D();
 
-/** Returns a number where `0 <= x < 1` where lower values make a pyramid in the middle. */
+/** Returns a number where `0 <= x <= 1` where lower values make a pyramid in the middle. */
 export function square(x: number, y: number): number {
   const distanceX = Math.abs(x - centerX);
   const distanceY = Math.abs(y - centerY);
@@ -32,7 +32,7 @@ export function square(x: number, y: number): number {
   return Math.min(1, minimumDistance / distanceToWall);
 }
 
-/** Returns a number where `0 <= x < 1` where lower values make a cone in the middle. */
+/** Returns a number where `0 <= x <= 1` where lower values make a cone in the middle. */
 export function circle(x: number, y: number): number {
   const distanceX = x - centerX;
   const distanceY = y - centerY;
@@ -51,7 +51,7 @@ export function noise(x: number, y: number): number {
   return (1 + result / totalAmplitude) / 2;
 }
 
-/** Combination of noise and square resulting in a value where `0 <= x < 1`. */
+/** Combination of `noise()` and a shape function resulting in a value where `0 <= x < 1`. */
 export function ensemble(x: number, y: number): number {
   return (noise(x, y) - circle(x, y) + 1) / 2;
 }
