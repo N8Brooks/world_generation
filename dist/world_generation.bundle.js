@@ -96,16 +96,29 @@ function makeNoise2D(random = Math.random) {
     };
 }
 const PERSISTANCE = 0.5;
+const height1 = window.innerHeight;
+const halfHeight = Math.floor(height1 / 2) + height1 % 2;
+const width1 = window.innerWidth;
+const halfWidth = Math.floor(width1 / 2) + width1 % 2;
+const half = Math.min(halfHeight, halfWidth);
 const simplexNoise = makeNoise2D();
+function square(x, y) {
+    const horizontalDistance = Math.abs(x - halfWidth);
+    const verticalDistance = Math.abs(y - halfHeight);
+    const minimumDistance = Math.max(horizontalDistance, verticalDistance);
+    const result = Math.min(1, minimumDistance / half);
+    return result;
+}
 function noise(x, y) {
     let maxAmp = 0, result = 0, amp = 1, freq = 0.007;
-    for(let i = 0; i < 8; i++){
+    for(let i = 0; i < 10; i++){
         result += simplexNoise(x * freq, y * freq) * amp;
         maxAmp += amp;
         amp *= PERSISTANCE;
         freq *= 2;
     }
-    return 127.5 * (result / maxAmp + 1);
+    result = Math.max(-1, result / maxAmp - square(x, y));
+    return 127.5 * (result + 1);
 }
 class WorldGeneration1 extends HTMLElement {
     canvas;
