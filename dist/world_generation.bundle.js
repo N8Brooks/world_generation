@@ -95,8 +95,30 @@ function makeNoise2D(random = Math.random) {
         return 70.14805770653952 * (n0 + n1 + n2);
     };
 }
-const PERSISTANCE = 0.5;
-const MAP_COLOR_CONFIG = [
+const centerY = Math.floor(window.innerHeight / 2);
+const centerX = Math.floor(window.innerWidth / 2);
+const distanceToWall = Math.min(centerX, centerY);
+function square(x, y) {
+    const distanceX = Math.abs(x - centerX);
+    const distanceY = Math.abs(y - centerY);
+    const minimumDistance = Math.max(distanceX, distanceY);
+    return Math.min(1, minimumDistance / distanceToWall);
+}
+function circle(x, y) {
+    const distanceX = x - centerX;
+    const distanceY = y - centerY;
+    const distance = Math.hypot(distanceX, distanceY);
+    return Math.min(1, distance / distanceToWall);
+}
+function none(_x, _y) {
+    return 0.5;
+}
+const shapes = {
+    circle,
+    square,
+    none
+};
+const atlas = [
     {
         upperBound: 40,
         rgbColor: [
@@ -186,37 +208,154 @@ const MAP_COLOR_CONFIG = [
         ]
     }
 ];
-const COLOR_CONFIG = MAP_COLOR_CONFIG;
-const heightToColor = processColorConfig(COLOR_CONFIG);
-const totalAmplitude = 2 - 1 / 2 ** (5 - 1);
-const centerY = Math.floor(window.innerHeight / 2);
-const centerX = Math.floor(window.innerWidth / 2);
-const distanceToWall = Math.min(centerX, centerY);
-const simplexNoise = makeNoise2D();
-function circle(x, y) {
-    const distanceX = x - centerX;
-    const distanceY = y - centerY;
-    const distance = Math.hypot(distanceX, distanceY);
-    return Math.min(1, distance / distanceToWall);
-}
-function noise(x, y) {
-    let result = 0, amplitude = 1, frequency = 0.002;
-    for(let octave = 0; octave < 5; octave++){
-        result += amplitude * simplexNoise(x * frequency, y * frequency);
-        amplitude *= PERSISTANCE;
-        frequency *= 2;
+const pixel = [
+    {
+        upperBound: 26,
+        rgbColor: [
+            1,
+            49,
+            99
+        ]
+    },
+    {
+        upperBound: 30,
+        rgbColor: [
+            0,
+            62,
+            125
+        ]
+    },
+    {
+        upperBound: 34,
+        rgbColor: [
+            0,
+            70,
+            139
+        ]
+    },
+    {
+        upperBound: 38,
+        rgbColor: [
+            1,
+            84,
+            168
+        ]
+    },
+    {
+        upperBound: 42,
+        rgbColor: [
+            0,
+            94,
+            189
+        ]
+    },
+    {
+        upperBound: 45,
+        rgbColor: [
+            0,
+            106,
+            212
+        ]
+    },
+    {
+        upperBound: 50,
+        rgbColor: [
+            1,
+            118,
+            237
+        ]
+    },
+    {
+        upperBound: 53,
+        rgbColor: [
+            237,
+            195,
+            154
+        ]
+    },
+    {
+        upperBound: 56,
+        rgbColor: [
+            43,
+            144,
+            0
+        ]
+    },
+    {
+        upperBound: 58,
+        rgbColor: [
+            36,
+            128,
+            47
+        ]
+    },
+    {
+        upperBound: 64,
+        rgbColor: [
+            22,
+            89,
+            32
+        ]
+    },
+    {
+        upperBound: 70,
+        rgbColor: [
+            122,
+            122,
+            122
+        ]
+    },
+    {
+        upperBound: 75,
+        rgbColor: [
+            143,
+            143,
+            143
+        ]
+    },
+    {
+        upperBound: 80,
+        rgbColor: [
+            204,
+            204,
+            204
+        ]
+    },
+    {
+        upperBound: 100,
+        rgbColor: [
+            255,
+            255,
+            255
+        ]
     }
-    return (1 + result / totalAmplitude) / 2;
+];
+const styles = {
+    atlas,
+    pixel
+};
+const noise2D = makeNoise2D();
+function makeWorldGenerator(options) {
+    const { style , shape , octaves , frequency , persistance ,  } = options;
+    const shaper = shapes[shape];
+    const heightToColor = makeHeightToColor(styles[style]);
+    const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);
+    return function(x, y) {
+        const value = noise(x, y) - shaper(x, y) + 1;
+        const height = Math.floor(50 * value);
+        return heightToColor[height];
+    };
+    function noise(x, y) {
+        let result = 0, amp = 1, freq = frequency;
+        for(let octave = 0; octave < octaves; octave++){
+            result += amp * noise2D(x * freq, y * freq);
+            amp *= persistance;
+            freq *= 2;
+        }
+        return (1 + result / totalAmplitude) / 2;
+    }
 }
-function ensemble(x, y) {
-    const value = noise(x, y) - circle(x, y) + 1;
-    const height = Math.floor(50 * value);
-    return heightToColor[height];
-}
-function rgb(r, g, b) {
-    return r + (g << 8) + (b << 16) + (255 << 24);
-}
-function processColorConfig(colorConfig) {
+function makeHeightToColor(colorConfig) {
     colorConfig = [
         ...colorConfig
     ];
@@ -239,17 +378,33 @@ function processColorConfig(colorConfig) {
     }
     return heightToColor;
 }
+function rgb(r, g, b) {
+    return r + (g << 8) + (b << 16) + (255 << 24);
+}
+const defaultOptions = {
+    style: "pixel",
+    shape: "circle",
+    frequency: 0.002,
+    octaves: 5,
+    persistance: 0.5
+};
 class WorldGeneration1 extends HTMLElement {
     canvas;
     context;
     height;
     width;
     imageData;
-    constructor(){
+    options;
+    constructor(options1 = {
+    }){
         super();
         const shadowRoot = this.attachShadow({
             mode: "open"
         });
+        this.options = {
+            ...defaultOptions,
+            ...options1
+        };
         this.canvas = document.createElement("canvas");
         const context1 = this.canvas.getContext("2d");
         if (context1 === null) {
@@ -259,14 +414,15 @@ class WorldGeneration1 extends HTMLElement {
         this.width = this.canvas.width = window.innerWidth;
         this.height = this.canvas.height = window.innerHeight;
         shadowRoot.append(this.canvas);
-        this.generate();
+        this.render();
     }
-    generate() {
+    render() {
+        const worldGenerator = makeWorldGenerator(this.options);
         const imageData = new ImageData(this.width, this.height);
         const buffer = new Uint32Array(imageData.data.buffer);
         for(let x = 0; x < this.width; x++){
             for(let y = 0; y < this.height; y++){
-                buffer[this.width * y + x] = ensemble(x, y);
+                buffer[this.width * y + x] = worldGenerator(x, y);
             }
         }
         this.context.putImageData(imageData, 0, 0);
