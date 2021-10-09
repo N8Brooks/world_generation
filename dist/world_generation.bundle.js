@@ -96,29 +96,28 @@ function makeNoise2D(random = Math.random) {
     };
 }
 const PERSISTANCE = 0.5;
-const height1 = window.innerHeight;
-const halfHeight = Math.floor(height1 / 2) + height1 % 2;
-const width1 = window.innerWidth;
-const halfWidth = Math.floor(width1 / 2) + width1 % 2;
-const half = Math.min(halfHeight, halfWidth);
+const totalAmplitude = 2 - 1 / 2 ** (10 - 1);
+const centerY = Math.floor(window.innerHeight / 2);
+const centerX = Math.floor(window.innerWidth / 2);
+const distanceToWall = Math.min(centerX, centerY);
 const simplexNoise = makeNoise2D();
-function square(x, y) {
-    const horizontalDistance = Math.abs(x - halfWidth);
-    const verticalDistance = Math.abs(y - halfHeight);
-    const minimumDistance = Math.max(horizontalDistance, verticalDistance);
-    const result = Math.min(1, minimumDistance / half);
-    return result;
+function circle(x, y) {
+    const distanceX = x - centerX;
+    const distanceY = y - centerY;
+    const distance = Math.hypot(distanceX, distanceY);
+    return Math.min(1, distance / distanceToWall);
 }
 function noise(x, y) {
-    let maxAmp = 0, result = 0, amp = 1, freq = 0.007;
-    for(let i = 0; i < 10; i++){
-        result += simplexNoise(x * freq, y * freq) * amp;
-        maxAmp += amp;
-        amp *= PERSISTANCE;
-        freq *= 2;
+    let result = 0, amplitude = 1, frequency = 0.002;
+    for(let octave = 0; octave < 10; octave++){
+        result += amplitude * simplexNoise(x * frequency, y * frequency);
+        amplitude *= PERSISTANCE;
+        frequency *= 2;
     }
-    result = Math.max(-1, result / maxAmp - square(x, y));
-    return 127.5 * (result + 1);
+    return (1 + result / totalAmplitude) / 2;
+}
+function ensemble(x, y) {
+    return (noise(x, y) - circle(x, y) + 1) / 2;
 }
 class WorldGeneration1 extends HTMLElement {
     canvas;
@@ -147,7 +146,7 @@ class WorldGeneration1 extends HTMLElement {
         const buffer = new Uint32Array(imageData.data.buffer);
         for(let x = 0; x < this.width; x++){
             for(let y = 0; y < this.height; y++){
-                buffer[this.width * y + x] = noise(x, y) << 24;
+                buffer[this.width * y + x] = 256 * ensemble(x, y) << 24;
             }
         }
         console.log(imageData);

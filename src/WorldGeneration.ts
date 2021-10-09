@@ -1,4 +1,4 @@
-import { noise } from "./noise.ts";
+import { ensemble } from "./heightGeneration.ts";
 
 export class WorldGeneration extends HTMLElement {
   declare canvas: HTMLCanvasElement;
@@ -29,7 +29,7 @@ export class WorldGeneration extends HTMLElement {
     const buffer = new Uint32Array(imageData.data.buffer);
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        buffer[this.width * y + x] = noise(x, y) << 24;
+        buffer[this.width * y + x] = 256 * ensemble(x, y) << 24;
       }
     }
     console.log(imageData);
