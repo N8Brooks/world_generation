@@ -52,10 +52,10 @@ export function noise(x: number, y: number): number {
   return (1 + result / totalAmplitude) / 2;
 }
 
-/** Combination of `noise()` and a shape function resulting in a value where `0 <= x < 1`. */
+/** Returns a 32-bit number representing a color from a `x` and `y` coordinate. */
 export function ensemble(x: number, y: number): number {
   // float where `0 <= value < 2`
-  const value = (noise(x, y) - square(x, y) + 1);
+  const value = noise(x, y) - circle(x, y) + 1;
   // integer where `0 <= height < 100`;
   const height = Math.floor(50 * value);
   return heightToColor[height];

@@ -193,11 +193,11 @@ const centerY = Math.floor(window.innerHeight / 2);
 const centerX = Math.floor(window.innerWidth / 2);
 const distanceToWall = Math.min(centerX, centerY);
 const simplexNoise = makeNoise2D();
-function square(x, y) {
-    const distanceX = Math.abs(x - centerX);
-    const distanceY = Math.abs(y - centerY);
-    const minimumDistance = Math.max(distanceX, distanceY);
-    return Math.min(1, minimumDistance / distanceToWall);
+function circle(x, y) {
+    const distanceX = x - centerX;
+    const distanceY = y - centerY;
+    const distance = Math.hypot(distanceX, distanceY);
+    return Math.min(1, distance / distanceToWall);
 }
 function noise(x, y) {
     let result = 0, amplitude = 1, frequency = 0.002;
@@ -209,7 +209,7 @@ function noise(x, y) {
     return (1 + result / totalAmplitude) / 2;
 }
 function ensemble(x, y) {
-    const value = noise(x, y) - square(x, y) + 1;
+    const value = noise(x, y) - circle(x, y) + 1;
     const height = Math.floor(50 * value);
     return heightToColor[height];
 }
