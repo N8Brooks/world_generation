@@ -189,7 +189,6 @@ const COLOR_CONFIG = [
     }
 ];
 const heightToColor = processColorConfig(COLOR_CONFIG);
-console.log(heightToColor);
 const totalAmplitude = 2 - 1 / 2 ** (5 - 1);
 const centerY = Math.floor(window.innerHeight / 2);
 const centerX = Math.floor(window.innerWidth / 2);
@@ -224,7 +223,6 @@ function processColorConfig(colorConfig) {
     ];
     colorConfig.sort((a, b)=>a.upperBound - b.upperBound
     );
-    console.log(colorConfig);
     colorConfig.push({
         upperBound: 100,
         r: 0,
