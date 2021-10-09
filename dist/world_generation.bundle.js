@@ -96,7 +96,101 @@ function makeNoise2D(random = Math.random) {
     };
 }
 const PERSISTANCE = 0.5;
-const totalAmplitude = 2 - 1 / 2 ** (10 - 1);
+const COLOR_CONFIG = [
+    {
+        upperBound: 26,
+        r: 1,
+        g: 49,
+        b: 99
+    },
+    {
+        upperBound: 30,
+        r: 0,
+        g: 62,
+        b: 125
+    },
+    {
+        upperBound: 34,
+        r: 0,
+        g: 70,
+        b: 139
+    },
+    {
+        upperBound: 38,
+        r: 1,
+        g: 84,
+        b: 168
+    },
+    {
+        upperBound: 42,
+        r: 0,
+        g: 94,
+        b: 189
+    },
+    {
+        upperBound: 45,
+        r: 0,
+        g: 106,
+        b: 212
+    },
+    {
+        upperBound: 50,
+        r: 1,
+        g: 118,
+        b: 237
+    },
+    {
+        upperBound: 53,
+        r: 237,
+        g: 195,
+        b: 154
+    },
+    {
+        upperBound: 56,
+        r: 43,
+        g: 144,
+        b: 0
+    },
+    {
+        upperBound: 58,
+        r: 36,
+        g: 128,
+        b: 47
+    },
+    {
+        upperBound: 64,
+        r: 22,
+        g: 89,
+        b: 32
+    },
+    {
+        upperBound: 70,
+        r: 122,
+        g: 122,
+        b: 122
+    },
+    {
+        upperBound: 75,
+        r: 143,
+        g: 143,
+        b: 143
+    },
+    {
+        upperBound: 80,
+        r: 204,
+        g: 204,
+        b: 204
+    },
+    {
+        upperBound: 100,
+        r: 255,
+        g: 255,
+        b: 255
+    }
+];
+const heightToColor = processColorConfig(COLOR_CONFIG);
+console.log(heightToColor);
+const totalAmplitude = 2 - 1 / 2 ** (5 - 1);
 const centerY = Math.floor(window.innerHeight / 2);
 const centerX = Math.floor(window.innerWidth / 2);
 const distanceToWall = Math.min(centerX, centerY);
@@ -109,7 +203,7 @@ function circle(x, y) {
 }
 function noise(x, y) {
     let result = 0, amplitude = 1, frequency = 0.002;
-    for(let octave = 0; octave < 10; octave++){
+    for(let octave = 0; octave < 5; octave++){
         result += amplitude * simplexNoise(x * frequency, y * frequency);
         amplitude *= PERSISTANCE;
         frequency *= 2;
@@ -117,7 +211,34 @@ function noise(x, y) {
     return (1 + result / totalAmplitude) / 2;
 }
 function ensemble(x, y) {
-    return (noise(x, y) - circle(x, y) + 1) / 2;
+    const value = noise(x, y) - circle(x, y) + 1;
+    const height = Math.floor(50 * value);
+    return heightToColor[height];
+}
+function rgba(r, g, b, a = 255) {
+    return r + (g << 8) + (b << 16) + (a << 24);
+}
+function processColorConfig(colorConfig) {
+    colorConfig = [
+        ...colorConfig
+    ];
+    colorConfig.sort((a, b)=>a.upperBound - b.upperBound
+    );
+    console.log(colorConfig);
+    colorConfig.push({
+        upperBound: 100,
+        r: 0,
+        g: 0,
+        b: 0
+    });
+    const heightToColor = Array(100);
+    let lowerBound = 0;
+    for (const { upperBound , r , g , b , a  } of colorConfig){
+        const color = rgba(r, g, b, a);
+        heightToColor.fill(color, lowerBound, upperBound + 1);
+        lowerBound = upperBound;
+    }
+    return heightToColor;
 }
 class WorldGeneration1 extends HTMLElement {
     canvas;
@@ -146,10 +267,9 @@ class WorldGeneration1 extends HTMLElement {
         const buffer = new Uint32Array(imageData.data.buffer);
         for(let x = 0; x < this.width; x++){
             for(let y = 0; y < this.height; y++){
-                buffer[this.width * y + x] = 256 * ensemble(x, y) << 24;
+                buffer[this.width * y + x] = ensemble(x, y);
             }
         }
-        console.log(imageData);
         this.context.putImageData(imageData, 0, 0);
     }
 }
