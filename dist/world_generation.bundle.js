@@ -96,98 +96,129 @@ function makeNoise2D(random = Math.random) {
     };
 }
 const PERSISTANCE = 0.5;
-const COLOR_CONFIG = [
+const PIXEL_COLOR_CONFIG = [
     {
         upperBound: 26,
-        r: 1,
-        g: 49,
-        b: 99
+        rgbColor: [
+            1,
+            49,
+            99
+        ]
     },
     {
         upperBound: 30,
-        r: 0,
-        g: 62,
-        b: 125
+        rgbColor: [
+            0,
+            62,
+            125
+        ]
     },
     {
         upperBound: 34,
-        r: 0,
-        g: 70,
-        b: 139
+        rgbColor: [
+            0,
+            70,
+            139
+        ]
     },
     {
         upperBound: 38,
-        r: 1,
-        g: 84,
-        b: 168
+        rgbColor: [
+            1,
+            84,
+            168
+        ]
     },
     {
         upperBound: 42,
-        r: 0,
-        g: 94,
-        b: 189
+        rgbColor: [
+            0,
+            94,
+            189
+        ]
     },
     {
         upperBound: 45,
-        r: 0,
-        g: 106,
-        b: 212
+        rgbColor: [
+            0,
+            106,
+            212
+        ]
     },
     {
         upperBound: 50,
-        r: 1,
-        g: 118,
-        b: 237
+        rgbColor: [
+            1,
+            118,
+            237
+        ]
     },
     {
         upperBound: 53,
-        r: 237,
-        g: 195,
-        b: 154
+        rgbColor: [
+            237,
+            195,
+            154
+        ]
     },
     {
         upperBound: 56,
-        r: 43,
-        g: 144,
-        b: 0
+        rgbColor: [
+            43,
+            144,
+            0
+        ]
     },
     {
         upperBound: 58,
-        r: 36,
-        g: 128,
-        b: 47
+        rgbColor: [
+            36,
+            128,
+            47
+        ]
     },
     {
         upperBound: 64,
-        r: 22,
-        g: 89,
-        b: 32
+        rgbColor: [
+            22,
+            89,
+            32
+        ]
     },
     {
         upperBound: 70,
-        r: 122,
-        g: 122,
-        b: 122
+        rgbColor: [
+            122,
+            122,
+            122
+        ]
     },
     {
         upperBound: 75,
-        r: 143,
-        g: 143,
-        b: 143
+        rgbColor: [
+            143,
+            143,
+            143
+        ]
     },
     {
         upperBound: 80,
-        r: 204,
-        g: 204,
-        b: 204
+        rgbColor: [
+            204,
+            204,
+            204
+        ]
     },
     {
         upperBound: 100,
-        r: 255,
-        g: 255,
-        b: 255
+        rgbColor: [
+            255,
+            255,
+            255
+        ]
     }
 ];
+const COLOR_CONFIG = PIXEL_COLOR_CONFIG;
 const heightToColor = processColorConfig(COLOR_CONFIG);
 const totalAmplitude = 2 - 1 / 2 ** (5 - 1);
 const centerY = Math.floor(window.innerHeight / 2);
@@ -214,8 +245,8 @@ function ensemble(x, y) {
     const height = Math.floor(50 * value);
     return heightToColor[height];
 }
-function rgba(r, g, b, a = 255) {
-    return r + (g << 8) + (b << 16) + (a << 24);
+function rgb(r, g, b) {
+    return r + (g << 8) + (b << 16) + (255 << 24);
 }
 function processColorConfig(colorConfig) {
     colorConfig = [
@@ -225,14 +256,16 @@ function processColorConfig(colorConfig) {
     );
     colorConfig.push({
         upperBound: 100,
-        r: 0,
-        g: 0,
-        b: 0
+        rgbColor: [
+            0,
+            0,
+            0
+        ]
     });
     const heightToColor = Array(100);
     let lowerBound = 0;
-    for (const { upperBound , r , g , b , a  } of colorConfig){
-        const color = rgba(r, g, b, a);
+    for (const { upperBound , rgbColor: [r, g, b]  } of colorConfig){
+        const color = rgb(r, g, b);
         heightToColor.fill(color, lowerBound, upperBound + 1);
         lowerBound = upperBound;
     }

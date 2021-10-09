@@ -1,5 +1,11 @@
 import { makeNoise2D } from "https://deno.land/x/fast_simplex_noise@v4.0.0/2d.ts";
-import { COLOR_CONFIG, FREQUENCY, OCTAVES, PERSISTANCE } from "./constants.ts";
+import {
+  COLOR_CONFIG,
+  ColorSettings,
+  FREQUENCY,
+  OCTAVES,
+  PERSISTANCE,
+} from "./constants.ts";
 
 /** Maps numbers where `0 <= height < 100` to colors. */
 const heightToColor = processColorConfig(COLOR_CONFIG);
@@ -18,14 +24,6 @@ const distanceToWall = Math.min(centerX, centerY);
 
 /** Simplex noise function. */
 const simplexNoise = makeNoise2D();
-
-export type ColorSettings = {
-  upperBound: number;
-  r: number;
-  g: number;
-  b: number;
-  a?: number;
-};
 
 /** Returns a number where `0 <= x <= 1` where lower values make a pyramid in the middle. */
 export function square(x: number, y: number): number {
@@ -63,20 +61,20 @@ export function ensemble(x: number, y: number): number {
   return heightToColor[height];
 }
 
-/** Maps 8-bit rgba values to a 32-bit integer. */
-export function rgba(r: number, g: number, b: number, a = 255): number {
-  return r + (g << 8) + (b << 16) + (a << 24);
+/** Maps 8-bit rgb values to a 32-bit integer. */
+export function rgb(r: number, g: number, b: number): number {
+  return r + (g << 8) + (b << 16) + (255 << 24);
 }
 
 /** Creates an `Array` of length 100 containing colors. */
 export function processColorConfig(colorConfig: ColorSettings[]): number[] {
   colorConfig = [...colorConfig];
   colorConfig.sort((a, b) => a.upperBound - b.upperBound);
-  colorConfig.push({ upperBound: 100, r: 0, g: 0, b: 0 });
+  colorConfig.push({ upperBound: 100, rgbColor: [0, 0, 0] });
   const heightToColor: number[] = Array(100);
   let lowerBound = 0;
-  for (const { upperBound, r, g, b, a } of colorConfig) {
-    const color = rgba(r, g, b, a);
+  for (const { upperBound, rgbColor: [r, g, b] } of colorConfig) {
+    const color = rgb(r, g, b);
     heightToColor.fill(color, lowerBound, upperBound + 1);
     lowerBound = upperBound;
   }
