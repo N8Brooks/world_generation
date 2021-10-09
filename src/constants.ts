@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-unused-vars
+
 /** Used to scale `x` and `y` values. */
 export const FREQUENCY = 0.002;
 
@@ -32,4 +34,18 @@ const PIXEL_COLOR_CONFIG: ColorSettings[] = [
   { upperBound: 100, rgbColor: [255, 255, 255] }, // light snow
 ];
 
-export const COLOR_CONFIG = PIXEL_COLOR_CONFIG;
+const MAP_COLOR_CONFIG: ColorSettings[] = [
+  { upperBound: 40, rgbColor: [138, 180, 248] }, // water
+  { upperBound: 48, rgbColor: [187, 226, 198] }, // light grass
+  { upperBound: 50, rgbColor: [168, 218, 181] }, // dark grass
+  { upperBound: 58, rgbColor: [251, 248, 243] }, // light sand
+  { upperBound: 61, rgbColor: [245, 240, 228] }, // dark sand
+  { upperBound: 64, rgbColor: [148, 210, 165] }, // light trees
+  { upperBound: 66, rgbColor: [136, 193, 152] }, // dark trees
+  { upperBound: 75, rgbColor: [178, 207, 189] }, // light rock
+  { upperBound: 78, rgbColor: [164, 191, 174] }, // dark rock
+  { upperBound: 80, rgbColor: [233, 233, 233] }, // dark snow
+  { upperBound: 100, rgbColor: [255, 255, 255] }, // light snow
+];
+
+export const COLOR_CONFIG = MAP_COLOR_CONFIG;

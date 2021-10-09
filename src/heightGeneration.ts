@@ -55,7 +55,7 @@ export function noise(x: number, y: number): number {
 /** Combination of `noise()` and a shape function resulting in a value where `0 <= x < 1`. */
 export function ensemble(x: number, y: number): number {
   // float where `0 <= value < 2`
-  const value = (noise(x, y) - circle(x, y) + 1);
+  const value = (noise(x, y) - square(x, y) + 1);
   // integer where `0 <= height < 100`;
   const height = Math.floor(50 * value);
   return heightToColor[height];

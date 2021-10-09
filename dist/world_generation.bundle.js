@@ -96,117 +96,85 @@ function makeNoise2D(random = Math.random) {
     };
 }
 const PERSISTANCE = 0.5;
-const PIXEL_COLOR_CONFIG = [
+const MAP_COLOR_CONFIG = [
     {
-        upperBound: 26,
+        upperBound: 40,
         rgbColor: [
-            1,
-            49,
-            99
+            138,
+            180,
+            248
         ]
     },
     {
-        upperBound: 30,
+        upperBound: 48,
         rgbColor: [
-            0,
-            62,
-            125
-        ]
-    },
-    {
-        upperBound: 34,
-        rgbColor: [
-            0,
-            70,
-            139
-        ]
-    },
-    {
-        upperBound: 38,
-        rgbColor: [
-            1,
-            84,
-            168
-        ]
-    },
-    {
-        upperBound: 42,
-        rgbColor: [
-            0,
-            94,
-            189
-        ]
-    },
-    {
-        upperBound: 45,
-        rgbColor: [
-            0,
-            106,
-            212
+            187,
+            226,
+            198
         ]
     },
     {
         upperBound: 50,
         rgbColor: [
-            1,
-            118,
-            237
-        ]
-    },
-    {
-        upperBound: 53,
-        rgbColor: [
-            237,
-            195,
-            154
-        ]
-    },
-    {
-        upperBound: 56,
-        rgbColor: [
-            43,
-            144,
-            0
+            168,
+            218,
+            181
         ]
     },
     {
         upperBound: 58,
         rgbColor: [
-            36,
-            128,
-            47
+            251,
+            248,
+            243
+        ]
+    },
+    {
+        upperBound: 61,
+        rgbColor: [
+            245,
+            240,
+            228
         ]
     },
     {
         upperBound: 64,
         rgbColor: [
-            22,
-            89,
-            32
+            148,
+            210,
+            165
         ]
     },
     {
-        upperBound: 70,
+        upperBound: 66,
         rgbColor: [
-            122,
-            122,
-            122
+            136,
+            193,
+            152
         ]
     },
     {
         upperBound: 75,
         rgbColor: [
-            143,
-            143,
-            143
+            178,
+            207,
+            189
+        ]
+    },
+    {
+        upperBound: 78,
+        rgbColor: [
+            164,
+            191,
+            174
         ]
     },
     {
         upperBound: 80,
         rgbColor: [
-            204,
-            204,
-            204
+            233,
+            233,
+            233
         ]
     },
     {
@@ -218,18 +186,18 @@ const PIXEL_COLOR_CONFIG = [
         ]
     }
 ];
-const COLOR_CONFIG = PIXEL_COLOR_CONFIG;
+const COLOR_CONFIG = MAP_COLOR_CONFIG;
 const heightToColor = processColorConfig(COLOR_CONFIG);
 const totalAmplitude = 2 - 1 / 2 ** (5 - 1);
 const centerY = Math.floor(window.innerHeight / 2);
 const centerX = Math.floor(window.innerWidth / 2);
 const distanceToWall = Math.min(centerX, centerY);
 const simplexNoise = makeNoise2D();
-function circle(x, y) {
-    const distanceX = x - centerX;
-    const distanceY = y - centerY;
-    const distance = Math.hypot(distanceX, distanceY);
-    return Math.min(1, distance / distanceToWall);
+function square(x, y) {
+    const distanceX = Math.abs(x - centerX);
+    const distanceY = Math.abs(y - centerY);
+    const minimumDistance = Math.max(distanceX, distanceY);
+    return Math.min(1, minimumDistance / distanceToWall);
 }
 function noise(x, y) {
     let result = 0, amplitude = 1, frequency = 0.002;
@@ -241,7 +209,7 @@ function noise(x, y) {
     return (1 + result / totalAmplitude) / 2;
 }
 function ensemble(x, y) {
-    const value = noise(x, y) - circle(x, y) + 1;
+    const value = noise(x, y) - square(x, y) + 1;
     const height = Math.floor(50 * value);
     return heightToColor[height];
 }
