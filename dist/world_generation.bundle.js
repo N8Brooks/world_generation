@@ -95,298 +95,246 @@ function makeNoise2D(random = Math.random) {
         return 70.14805770653952 * (n0 + n1 + n2);
     };
 }
-const centerY = Math.floor(window.innerHeight / 2);
-const centerX = Math.floor(window.innerWidth / 2);
-const distanceToWall = Math.min(centerX, centerY);
+const Shapes = {
+    square,
+    circle,
+    flat
+};
 function square(x, y) {
-    const distanceX = Math.abs(x - centerX);
-    const distanceY = Math.abs(y - centerY);
+    const distanceX = Math.abs(x - this.centerX);
+    const distanceY = Math.abs(y - this.centerY);
     const minimumDistance = Math.max(distanceX, distanceY);
-    return Math.min(1, minimumDistance / distanceToWall);
+    return Math.min(1, minimumDistance / this.maximumDistance);
 }
 function circle(x, y) {
-    const distanceX = x - centerX;
-    const distanceY = y - centerY;
+    const distanceX = x - this.centerX;
+    const distanceY = y - this.centerY;
     const distance = Math.hypot(distanceX, distanceY);
-    return Math.min(1, distance / distanceToWall);
+    return Math.min(1, distance / this.maximumDistance);
 }
-function none(_x, _y) {
+function flat(_x, _y) {
     return 0.5;
 }
-const shapes = {
-    circle,
-    square,
-    none
-};
-const atlas = [
-    {
+class Theme {
+    colorBands;
+    constructor(...colorBands1){
+        this.colorBands = colorBands1;
+    }
+    get heightToColor() {
+        this.colorBands.sort((a, b)=>a.upperBound - b.upperBound
+        );
+        const heightToColor = Array(this.length);
+        let lowerBound = 0;
+        for (const { upperBound , rgbColor  } of this.colorBands){
+            const color = Theme.rgbToColor(rgbColor);
+            heightToColor.fill(color, lowerBound, upperBound + 1);
+            lowerBound = upperBound;
+        }
+        return heightToColor;
+    }
+    get length() {
+        return Math.max(-1, ...this.colorBands.map((band)=>band.upperBound
+        )) + 1;
+    }
+    static rgbToColor([r, g, b]) {
+        return r + (g << 8) + (b << 16) + (255 << 24);
+    }
+}
+const Themes = {
+    atlas: new Theme({
         upperBound: 40,
         rgbColor: [
             138,
             180,
             248
         ]
-    },
-    {
+    }, {
         upperBound: 48,
         rgbColor: [
             187,
             226,
             198
         ]
-    },
-    {
+    }, {
         upperBound: 50,
         rgbColor: [
             168,
             218,
             181
         ]
-    },
-    {
+    }, {
         upperBound: 58,
         rgbColor: [
             251,
             248,
             243
         ]
-    },
-    {
+    }, {
         upperBound: 61,
         rgbColor: [
             245,
             240,
             228
         ]
-    },
-    {
+    }, {
         upperBound: 64,
         rgbColor: [
             148,
             210,
             165
         ]
-    },
-    {
+    }, {
         upperBound: 66,
         rgbColor: [
             136,
             193,
             152
         ]
-    },
-    {
+    }, {
         upperBound: 75,
         rgbColor: [
             178,
             207,
             189
         ]
-    },
-    {
+    }, {
         upperBound: 78,
         rgbColor: [
             164,
             191,
             174
         ]
-    },
-    {
+    }, {
         upperBound: 80,
         rgbColor: [
             233,
             233,
             233
         ]
-    },
-    {
+    }, {
         upperBound: 100,
         rgbColor: [
             255,
             255,
             255
         ]
-    }
-];
-const pixel = [
-    {
+    }),
+    pixel: new Theme({
         upperBound: 26,
         rgbColor: [
             1,
             49,
             99
         ]
-    },
-    {
+    }, {
         upperBound: 30,
         rgbColor: [
             0,
             62,
             125
         ]
-    },
-    {
+    }, {
         upperBound: 34,
         rgbColor: [
             0,
             70,
             139
         ]
-    },
-    {
+    }, {
         upperBound: 38,
         rgbColor: [
             1,
             84,
             168
         ]
-    },
-    {
+    }, {
         upperBound: 42,
         rgbColor: [
             0,
             94,
             189
         ]
-    },
-    {
+    }, {
         upperBound: 45,
         rgbColor: [
             0,
             106,
             212
         ]
-    },
-    {
+    }, {
         upperBound: 50,
         rgbColor: [
             1,
             118,
             237
         ]
-    },
-    {
+    }, {
         upperBound: 53,
         rgbColor: [
             237,
             195,
             154
         ]
-    },
-    {
+    }, {
         upperBound: 56,
         rgbColor: [
             43,
             144,
             0
         ]
-    },
-    {
+    }, {
         upperBound: 58,
         rgbColor: [
             36,
             128,
             47
         ]
-    },
-    {
+    }, {
         upperBound: 64,
         rgbColor: [
             22,
             89,
             32
         ]
-    },
-    {
+    }, {
         upperBound: 70,
         rgbColor: [
             122,
             122,
             122
         ]
-    },
-    {
+    }, {
         upperBound: 75,
         rgbColor: [
             143,
             143,
             143
         ]
-    },
-    {
+    }, {
         upperBound: 80,
         rgbColor: [
             204,
             204,
             204
         ]
-    },
-    {
+    }, {
         upperBound: 100,
         rgbColor: [
             255,
             255,
             255
         ]
-    }
-];
-const styles = {
-    atlas,
-    pixel
+    })
 };
 const noise2D = makeNoise2D();
-function makeWorldGenerator(options) {
-    const { style , shape , octaves , frequency , persistance ,  } = options;
-    const shaper = shapes[shape];
-    const heightToColor = makeHeightToColor(styles[style]);
-    const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);
-    return function(x, y) {
-        const value = noise(x, y) - shaper(x, y) + 1;
-        const height = Math.floor(50 * value);
-        return heightToColor[height];
-    };
-    function noise(x, y) {
-        let result = 0, amp = 1, freq = frequency;
-        for(let octave = 0; octave < octaves; octave++){
-            result += amp * noise2D(x * freq, y * freq);
-            amp *= persistance;
-            freq *= 2;
-        }
-        return (1 + result / totalAmplitude) / 2;
-    }
-}
-function makeHeightToColor(colorConfig) {
-    colorConfig = [
-        ...colorConfig
-    ];
-    colorConfig.sort((a, b)=>a.upperBound - b.upperBound
-    );
-    colorConfig.push({
-        upperBound: 100,
-        rgbColor: [
-            0,
-            0,
-            0
-        ]
-    });
-    const heightToColor = Array(100);
-    let lowerBound = 0;
-    for (const { upperBound , rgbColor: [r, g, b]  } of colorConfig){
-        const color = rgb(r, g, b);
-        heightToColor.fill(color, lowerBound, upperBound + 1);
-        lowerBound = upperBound;
-    }
-    return heightToColor;
-}
-function rgb(r, g, b) {
-    return r + (g << 8) + (b << 16) + (255 << 24);
-}
 const defaultOptions = {
-    style: "pixel",
+    theme: "pixel",
     shape: "circle",
-    frequency: 0.002,
-    octaves: 5,
-    persistance: 0.5
+    simplex: {
+        frequency: 0.002,
+        octaves: 5,
+        persistance: 0.5
+    }
 };
 class WorldGeneration1 extends HTMLElement {
     canvas;
@@ -417,15 +365,39 @@ class WorldGeneration1 extends HTMLElement {
         this.render();
     }
     render() {
-        const worldGenerator = makeWorldGenerator(this.options);
         const imageData = new ImageData(this.width, this.height);
         const buffer = new Uint32Array(imageData.data.buffer);
+        const centerX = Math.floor(this.canvas.width / 2);
+        const centerY = Math.floor(this.canvas.height / 2);
+        const maximumDistance = Math.min(centerX, centerY);
+        const shape = Shapes[this.options.shape].bind({
+            centerX,
+            centerY,
+            maximumDistance
+        });
+        const { heightToColor  } = Themes[this.options.theme];
+        const { frequency , octaves , persistance  } = this.options.simplex;
+        const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);
         for(let x = 0; x < this.width; x++){
             for(let y = 0; y < this.height; y++){
-                buffer[this.width * y + x] = worldGenerator(x, y);
+                buffer[this.width * y + x] = ensemble(x, y);
             }
         }
         this.context.putImageData(imageData, 0, 0);
+        function ensemble(x, y) {
+            const value = noise(x, y) - shape(x, y) + 1;
+            const height = Math.floor(50 * value);
+            return heightToColor[height];
+        }
+        function noise(x, y) {
+            let result = 0, amp = 1, freq = frequency;
+            for(let octave = 0; octave < octaves; octave++){
+                result += amp * noise2D(x * freq, y * freq);
+                amp *= persistance;
+                freq *= 2;
+            }
+            return (1 + result / totalAmplitude) / 2;
+        }
     }
 }
 customElements.define("world-generation", WorldGeneration1);
