@@ -1,18 +1,19 @@
 # WorldGeneration
 
-World generation built with vanilla JavaScript.
+Simplex world generation built with the JavaScript canvas API and Web Workers
+API.
 
-# Demo:
+## Demo:
 
-## Pixel theme
+### Pixel theme
 
 https://n8brooks.github.io/world_generation/dist/index.html
 
-## Atlas theme
+### Atlas theme
 
 https://n8brooks.github.io/world_generation/dist/index.html?theme=atlas&shape=square
 
-## Other options:
+### Other options:
 
 - theme: "atlas" | "pixel"
 - shape: "circle" | "square" | "flat"
@@ -21,7 +22,7 @@ https://n8brooks.github.io/world_generation/dist/index.html?theme=atlas&shape=sq
 - frequency: float
 - persistance: float
 
-# Build Commands:
+## Build Commands:
 
 deno bundle src/world_generation.ts dist/world_generation.js -c deno.json
 
