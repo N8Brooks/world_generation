@@ -1,6 +1,6 @@
 import { Tile } from "./Tile.ts";
 import { Themes } from "./Themes.ts";
-import { ShapeOptions, SimplexOptions } from "./WorldGenerationOptions.ts";
+import { ShapeOptions, SimplexOptions } from "./world_generation_options.ts";
 
 /** Type of `data` object that a worker receives from main. */
 export type WorkerMessageData = {

@@ -1,7 +1,7 @@
 import { MAX_32_BIT_INTEGER } from "./random.ts";
 import { Tile } from "./Tile.ts";
 import { Pool } from "./Pool.ts";
-import { WorldGenerationOptions } from "./WorldGenerationOptions.ts";
+import { WorldGenerationOptions } from "./world_generation_options.ts";
 
 /** Parameter to break screen into grid. */
 const ROWS = 3;
