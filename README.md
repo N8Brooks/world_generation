@@ -10,7 +10,7 @@ https://n8brooks.github.io/world_generation/dist/index.html
 
 ## Atlas theme
 
-http://127.0.0.1:5500/dist/index.html?theme=atlas&shape=square
+https://n8brooks.github.io/world_generation/dist/index.html?theme=atlas&shape=square
 
 ## Other options:
 
