@@ -115,10 +115,6 @@ class WorldGeneration1 extends HTMLElement {
         super();
         this.style.height = "0";
         this.style.display = "block";
-        this.options = {
-            ...defaultOptions,
-            ...options1
-        };
         const shadowRoot = this.attachShadow({
             mode: "open"
         });
@@ -131,6 +127,10 @@ class WorldGeneration1 extends HTMLElement {
         this.width = this.canvas.width = window.innerWidth;
         this.height = this.canvas.height = window.innerHeight;
         shadowRoot.append(this.canvas);
+        this.options = {
+            ...defaultOptions,
+            ...options1
+        };
         this.tiles = [
             ...Tile.tessellate([
                 ROWS,

@@ -25,6 +25,7 @@ export type Reject = (reason: Event) => void;
 /** Type of work given to `Pool`. */
 export type Work = [WorkerMessageData, Resolve, Reject];
 
+/** Used to delegate work to web workers. */
 export class Pool {
   idleWorkers: Worker[] = [];
   workQueue: Work[] = [];
@@ -46,6 +47,7 @@ export class Pool {
     }
   }
 
+  /** Used for workers to pick up more work upon completion. */
   _workerDone(worker: Worker, error?: Event, data?: MainMessageData) {
     const settlers = this.workerMap.get(worker);
     if (settlers === undefined) {
@@ -70,6 +72,7 @@ export class Pool {
     }
   }
 
+  /** Add work for pool of workers to complete. */
   addWork(data: WorkerMessageData): Promise<MainMessageData> {
     return new Promise((resolve, reject) => {
       const worker = this.idleWorkers.pop();

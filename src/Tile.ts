@@ -1,5 +1,7 @@
+/** X and y coordinate on two-dimensional plane. */
 export type Point = [number, number];
 
+/** Width and height measurements. */
 export type Dimensions = [number, number];
 
 /** Represents a rectangle starting at `coordinate` that is the size of `dimensions`. */

@@ -3,8 +3,13 @@ import { Tile } from "./Tile.ts";
 import { Pool } from "./Pool.ts";
 import { WorldGenerationOptions } from "./WorldGenerationOptions.ts";
 
+/** Parameter to break screen into grid. */
 const ROWS = 3;
+
+/** Parameter to break screen into grid. */
 const COLS = 4;
+
+/** Amount of web workers to use. */
 const NUM_WORKERS = navigator.hardwareConcurrency || 2;
 
 /** Default options for `WorldGeneration`. */
@@ -34,11 +39,12 @@ export class WorldGeneration extends HTMLElement {
   /** Adds a canvas with a procedurally generated world. */
   constructor(options: Partial<WorldGenerationOptions> = {}) {
     super();
+
+    // style web component
     this.style.height = "0";
     this.style.display = "block";
 
-    this.options = { ...defaultOptions, ...options };
-
+    // setup canvas
     const shadowRoot = this.attachShadow({ mode: "open" });
     this.canvas = document.createElement("canvas");
     const context = this.canvas.getContext("2d");
@@ -50,6 +56,8 @@ export class WorldGeneration extends HTMLElement {
     this.height = this.canvas.height = window.innerHeight;
     shadowRoot.append(this.canvas);
 
+    // set up properties
+    this.options = { ...defaultOptions, ...options };
     this.tiles = [...Tile.tessellate([ROWS, COLS], [this.width, this.height])];
     this.pool = new Pool(NUM_WORKERS, "worker.js");
 
