@@ -104,34 +104,31 @@ function mulberry32(a) {
         return ((t ^ t >>> 14) >>> 0) / MAX_32_BIT_INTEGER;
     };
 }
-let centerX = NaN;
-let centerY = NaN;
-let maximumDistance = NaN;
 const Shapes = {
-    square,
-    circle,
-    flat
+    square (centerX, centerY) {
+        const maximumDistance = Math.min(centerX, centerY);
+        return function(x, y) {
+            const distanceX = Math.abs(x - centerX);
+            const distanceY = Math.abs(y - centerY);
+            const minimumDistance = Math.max(distanceX, distanceY);
+            return Math.min(1, minimumDistance / maximumDistance);
+        };
+    },
+    circle (centerX, centerY) {
+        const maximumDistance = Math.min(centerX, centerY);
+        return function(x, y) {
+            const distanceX = x - centerX;
+            const distanceY = y - centerY;
+            const distance = Math.hypot(distanceX, distanceY);
+            return Math.min(1, distance / maximumDistance);
+        };
+    },
+    flat (_centerX, _centerY) {
+        return function(_x, _y) {
+            return 0.5;
+        };
+    }
 };
-function setDimensions([width, height]) {
-    centerX = Math.floor(width / 2);
-    centerY = Math.floor(height / 2);
-    maximumDistance = Math.min(centerX, centerY);
-}
-function square(x, y) {
-    const distanceX = Math.abs(x - centerX);
-    const distanceY = Math.abs(y - centerY);
-    const minimumDistance = Math.max(distanceX, distanceY);
-    return Math.min(1, minimumDistance / maximumDistance);
-}
-function circle(x, y) {
-    const distanceX = x - centerX;
-    const distanceY = y - centerY;
-    const distance = Math.hypot(distanceX, distanceY);
-    return Math.min(1, distance / maximumDistance);
-}
-function flat(_x, _y) {
-    return 0.5;
-}
 class Theme {
     colorBands;
     constructor(...colorBands1){
@@ -344,15 +341,15 @@ const Themes = {
     })
 };
 onmessage = function(message) {
-    const { window , theme , tile: { width , height , x0 , y0  } , shape: shapeType , simplex: { seed , frequency , octaves , persistance  } ,  } = message.data;
+    const { theme , tile: { width , height , x0 , y0  } , simplex: { seed , frequency , octaves , persistance  } , shape: { name , xCenter , yCenter  } ,  } = message.data;
     const random = mulberry32(seed);
     const noise2D = makeNoise2D(random);
-    setDimensions(window);
-    const shape = Shapes[shapeType];
+    const makeShape = Shapes[name];
+    const shape = makeShape(xCenter, yCenter);
+    const { heightToColor  } = Themes[theme];
     const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);
     const imageData = new ImageData(width, height);
     const buffer = new Uint32Array(imageData.data.buffer);
-    const { heightToColor  } = Themes[theme];
     for(let x = 0; x < width; x++){
         for(let y = 0; y < height; y++){
             buffer[width * y + x] = ensemble(x, y);

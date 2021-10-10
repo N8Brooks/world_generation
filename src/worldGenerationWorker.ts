@@ -1,28 +1,37 @@
 import { makeNoise2D } from "https://deno.land/x/fast_simplex_noise@v4.0.0/2d.ts";
 import { mulberry32 } from "./random.ts";
-import { setDimensions, Shapes } from "./Shapes.ts";
+import { Shapes } from "./Shapes.ts";
 import { Themes } from "./Themes.ts";
-import { InputData } from "./WorkerPool.ts";
+import { WorkerMessageData } from "./WorkerPool.ts";
 
-onmessage = function (this: Window, message: MessageEvent<InputData>): void {
+onmessage = function (
+  this: Window,
+  message: MessageEvent<WorkerMessageData>,
+): void {
   const {
-    window,
     theme,
     tile: { width, height, x0, y0 },
-    shape: shapeType,
     simplex: { seed, frequency, octaves, persistance },
+    shape: { name, xCenter, yCenter },
   } = message.data;
 
+  // randomization
   const random = mulberry32(seed);
   const noise2D = makeNoise2D(random);
 
-  setDimensions(window);
-  const shape = Shapes[shapeType];
+  // shaping
+  const makeShape = Shapes[name];
+  const shape = makeShape(xCenter, yCenter);
+
+  // coloring
+  const { heightToColor } = Themes[theme];
+
+  // simplex matrix
   const totalAmplitude = 2 - 1 / (2 ** (octaves - 1));
   const imageData = new ImageData(width, height);
   const buffer = new Uint32Array(imageData.data.buffer);
-  const { heightToColor } = Themes[theme];
 
+  // fill matrix
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
       buffer[width * y + x] = ensemble(x, y);

@@ -2,7 +2,7 @@ import { MAX_32_BIT_INTEGER } from "./random.ts";
 import { Tile } from "./Tile.ts";
 import { Shapes } from "./Shapes.ts";
 import { Themes } from "./Themes.ts";
-import { WorkerPool } from "./WorkerPool.ts";
+import { SimplexOptions, WorkerPool } from "./WorkerPool.ts";
 
 const ROWS = 3;
 const COLS = 4;
@@ -13,14 +13,6 @@ export type WorldGenerationOptions = {
   theme: keyof typeof Themes;
   shape: keyof typeof Shapes;
   simplex: SimplexOptions;
-};
-
-/** Settings for simplex noise. */
-export type SimplexOptions = {
-  seed: number;
-  frequency: number;
-  octaves: number;
-  persistance: number;
 };
 
 /** Default options for `WorldGeneration`. */
@@ -76,19 +68,22 @@ export class WorldGeneration extends HTMLElement {
   render() {
     const {
       theme,
-      shape,
-      simplex: { seed, ...rest },
+      shape: name,
+      simplex: { ...simplex },
     } = this.options;
+
+    const shape = {
+      name,
+      xCenter: Math.floor(this.width / 2),
+      yCenter: Math.floor(this.height / 2),
+    };
+
     const promises = this.tiles.map((tile) =>
       this.workerPool.addWork({
         tile,
         theme,
         shape,
-        simplex: {
-          seed,
-          ...rest,
-        },
-        window: [this.width, this.height],
+        simplex,
       })
     );
 

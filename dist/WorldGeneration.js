@@ -144,19 +144,17 @@ class WorldGeneration1 extends HTMLElement {
         this.render();
     }
     render() {
-        const { theme , shape , simplex: { seed , ...rest } ,  } = this.options;
+        const { theme , shape: name , simplex: { ...simplex } ,  } = this.options;
+        const shape = {
+            name,
+            xCenter: Math.floor(this.width / 2),
+            yCenter: Math.floor(this.height / 2)
+        };
         const promises = this.tiles.map((tile)=>this.workerPool.addWork({
                 tile,
                 theme,
                 shape,
-                simplex: {
-                    seed,
-                    ...rest
-                },
-                window: [
-                    this.width,
-                    this.height
-                ]
+                simplex
             })
         );
         Promise.all(promises).then((responses)=>{
