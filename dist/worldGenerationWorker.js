@@ -95,22 +95,30 @@ function makeNoise2D(random = Math.random) {
         return 70.14805770653952 * (n0 + n1 + n2);
     };
 }
+let centerX = NaN;
+let centerY = NaN;
+let maximumDistance = NaN;
 const Shapes = {
     square,
     circle,
     flat
 };
+function setDimensions([width, height]) {
+    centerX = Math.floor(width / 2);
+    centerY = Math.floor(height / 2);
+    maximumDistance = Math.min(centerX, centerY);
+}
 function square(x, y) {
-    const distanceX = Math.abs(x - this.centerX);
-    const distanceY = Math.abs(y - this.centerY);
+    const distanceX = Math.abs(x - centerX);
+    const distanceY = Math.abs(y - centerY);
     const minimumDistance = Math.max(distanceX, distanceY);
-    return Math.min(1, minimumDistance / this.maximumDistance);
+    return Math.min(1, minimumDistance / maximumDistance);
 }
 function circle(x, y) {
-    const distanceX = x - this.centerX;
-    const distanceY = y - this.centerY;
+    const distanceX = x - centerX;
+    const distanceY = y - centerY;
     const distance = Math.hypot(distanceX, distanceY);
-    return Math.min(1, distance / this.maximumDistance);
+    return Math.min(1, distance / maximumDistance);
 }
 function flat(_x, _y) {
     return 0.5;
@@ -327,78 +335,37 @@ const Themes = {
     })
 };
 const noise2D = makeNoise2D();
-const defaultOptions = {
-    theme: "pixel",
-    shape: "circle",
-    simplex: {
-        frequency: 0.002,
-        octaves: 5,
-        persistance: 0.5
+onmessage = function(message) {
+    const { window , theme , rectangle: { width , height  } , shape: shapeType , simplex: { frequency , octaves , persistance  } ,  } = message.data;
+    setDimensions(window);
+    const shape = Shapes[shapeType];
+    const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);
+    const imageData = new ImageData(width, height);
+    const buffer = new Uint32Array(imageData.data.buffer);
+    const { heightToColor  } = Themes[theme];
+    for(let x = 0; x < width; x++){
+        for(let y = 0; y < height; y++){
+            buffer[width * y + x] = ensemble(x, y);
+        }
     }
+    function ensemble(x, y) {
+        const value = noise(x, y) - shape(x, y) + 1;
+        const height = Math.floor(50 * value);
+        return heightToColor[height];
+    }
+    function noise(x, y) {
+        let result = 0, amp = 1, freq = frequency;
+        for(let octave = 0; octave < octaves; octave++){
+            result += amp * noise2D(x * freq, y * freq);
+            amp *= persistance;
+            freq *= 2;
+        }
+        return (1 + result / totalAmplitude) / 2;
+    }
+    postMessage({
+        rectangle: message.data.rectangle,
+        imageData
+    }, [
+        imageData.data.buffer
+    ]);
 };
-class WorldGeneration1 extends HTMLElement {
-    canvas;
-    context;
-    height;
-    width;
-    imageData;
-    options;
-    constructor(options1 = {
-    }){
-        super();
-        const shadowRoot = this.attachShadow({
-            mode: "open"
-        });
-        this.options = {
-            ...defaultOptions,
-            ...options1
-        };
-        this.canvas = document.createElement("canvas");
-        const context1 = this.canvas.getContext("2d");
-        if (context1 === null) {
-            throw Error("canvas context identifier not supported");
-        }
-        this.context = context1;
-        this.width = this.canvas.width = window.innerWidth;
-        this.height = this.canvas.height = window.innerHeight;
-        shadowRoot.append(this.canvas);
-        this.render();
-    }
-    render() {
-        const imageData = new ImageData(this.width, this.height);
-        const buffer = new Uint32Array(imageData.data.buffer);
-        const centerX = Math.floor(this.canvas.width / 2);
-        const centerY = Math.floor(this.canvas.height / 2);
-        const maximumDistance = Math.min(centerX, centerY);
-        const shape = Shapes[this.options.shape].bind({
-            centerX,
-            centerY,
-            maximumDistance
-        });
-        const { heightToColor  } = Themes[this.options.theme];
-        const { frequency , octaves , persistance  } = this.options.simplex;
-        const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);
-        for(let x = 0; x < this.width; x++){
-            for(let y = 0; y < this.height; y++){
-                buffer[this.width * y + x] = ensemble(x, y);
-            }
-        }
-        this.context.putImageData(imageData, 0, 0);
-        function ensemble(x, y) {
-            const value = noise(x, y) - shape(x, y) + 1;
-            const height = Math.floor(50 * value);
-            return heightToColor[height];
-        }
-        function noise(x, y) {
-            let result = 0, amp = 1, freq = frequency;
-            for(let octave = 0; octave < octaves; octave++){
-                result += amp * noise2D(x * freq, y * freq);
-                amp *= persistance;
-                freq *= 2;
-            }
-            return (1 + result / totalAmplitude) / 2;
-        }
-    }
-}
-customElements.define("world-generation", WorldGeneration1);
-export { WorldGeneration1 as WorldGeneration };
