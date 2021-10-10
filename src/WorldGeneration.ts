@@ -30,6 +30,8 @@ export class WorldGeneration extends HTMLElement {
   /** Adds a canvas with a procedurally generated world. */
   constructor(options: Partial<WorldGenerationOptions> = {}) {
     super();
+    this.style.height = "0";
+    this.style.display = "block";
 
     this.options = { ...defaultOptions, ...options };
 

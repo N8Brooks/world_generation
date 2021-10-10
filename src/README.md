@@ -5,4 +5,3 @@ TODO:
 - Clean up project class structures.
 - Find better names for stuff.
 - Add unit tests with deno-dom.
-- Find out why `window.innerHeight` is bigger than the windows height.
