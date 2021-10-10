@@ -1,3 +1,4 @@
+import { MAX_32_BIT_INTEGER } from "./random.ts";
 import { Rectangle } from "./Rectangle.ts";
 import { WorkerPool } from "./WorkerPool.ts";
 import { WorldGenerationOptions } from "./WorldGenerationOptions.ts";
@@ -56,7 +57,7 @@ export class WorldGeneration extends HTMLElement {
 
   /** Generates image data for the canvas. */
   render() {
-    const seeds = Array.from({ length: 255 }, () => Math.random());
+    const seed = Math.trunc(Math.random() * MAX_32_BIT_INTEGER);
     const promises = this.rectangles.map((rectangle) =>
       this.workerPool.addWork({
         rectangle,
@@ -64,7 +65,7 @@ export class WorldGeneration extends HTMLElement {
         shape: this.options.shape,
         simplex: this.options.simplex,
         window: [this.width, this.height],
-        seeds,
+        seed,
       })
     );
 

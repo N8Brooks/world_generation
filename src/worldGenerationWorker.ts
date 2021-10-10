@@ -1,4 +1,5 @@
 import { makeNoise2D } from "https://deno.land/x/fast_simplex_noise@v4.0.0/2d.ts";
+import { mulberry32 } from "./random.ts";
 import { setDimensions, Shapes } from "./Shapes.ts";
 import { Themes } from "./Themes.ts";
 import { InputData } from "./WorkerPool.ts";
@@ -7,14 +8,14 @@ onmessage = function (this: Window, message: MessageEvent<InputData>): void {
   const {
     window,
     theme,
-    seeds,
+    seed,
     rectangle: { width, height, x0, y0 },
     shape: shapeType,
     simplex: { frequency, octaves, persistance },
   } = message.data;
 
   let i = 0;
-  const noise2D = makeNoise2D(() => seeds[i++]);
+  const noise2D = makeNoise2D(mulberry32(seed));
 
   setDimensions(window);
   const shape = Shapes[shapeType];

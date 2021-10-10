@@ -95,6 +95,15 @@ function makeNoise2D(random = Math.random) {
         return 70.14805770653952 * (n0 + n1 + n2);
     };
 }
+const MAX_32_BIT_INTEGER = 2 ** 32;
+function mulberry32(a) {
+    return function() {
+        let t = a += 1831565813;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / MAX_32_BIT_INTEGER;
+    };
+}
 let centerX = NaN;
 let centerY = NaN;
 let maximumDistance = NaN;
@@ -335,10 +344,9 @@ const Themes = {
     })
 };
 onmessage = function(message) {
-    const { window , theme , seeds , rectangle: { width , height , x0 , y0  } , shape: shapeType , simplex: { frequency , octaves , persistance  } ,  } = message.data;
+    const { window , theme , seed , rectangle: { width , height , x0 , y0  } , shape: shapeType , simplex: { frequency , octaves , persistance  } ,  } = message.data;
     let i = 0;
-    const noise2D = makeNoise2D(()=>seeds[i++]
-    );
+    const noise2D = makeNoise2D(mulberry32(seed));
     setDimensions(window);
     const shape = Shapes[shapeType];
     const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);

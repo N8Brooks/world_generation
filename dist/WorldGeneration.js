@@ -1,3 +1,4 @@
+const MAX_32_BIT_INTEGER = 2 ** 32;
 class Rectangle {
     x0;
     y0;
@@ -140,10 +141,7 @@ class WorldGeneration1 extends HTMLElement {
         this.render();
     }
     render() {
-        const seeds = Array.from({
-            length: 255
-        }, ()=>Math.random()
-        );
+        const seed = Math.trunc(Math.random() * MAX_32_BIT_INTEGER);
         const promises = this.rectangles.map((rectangle)=>this.workerPool.addWork({
                 rectangle,
                 theme: this.options.theme,
@@ -153,7 +151,7 @@ class WorldGeneration1 extends HTMLElement {
                     this.width,
                     this.height
                 ],
-                seeds
+                seed
             })
         );
         Promise.all(promises).then((responses)=>{
