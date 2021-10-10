@@ -8,14 +8,13 @@ onmessage = function (this: Window, message: MessageEvent<InputData>): void {
   const {
     window,
     theme,
-    seed,
     rectangle: { width, height, x0, y0 },
     shape: shapeType,
-    simplex: { frequency, octaves, persistance },
+    simplex: { seed, frequency, octaves, persistance },
   } = message.data;
 
-  let i = 0;
-  const noise2D = makeNoise2D(mulberry32(seed));
+  const random = mulberry32(seed);
+  const noise2D = makeNoise2D(random);
 
   setDimensions(window);
   const shape = Shapes[shapeType];

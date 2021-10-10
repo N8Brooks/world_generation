@@ -1,15 +1,14 @@
 import { Dimensions, Rectangle } from "./Rectangle.ts";
 import { Shapes } from "./Shapes.ts";
 import { Themes } from "./Themes.ts";
-import { SimplexOptions } from "./WorldGenerationOptions.ts";
+import { SimplexOptions } from "./WorldGeneration.ts";
 
 export type InputData = {
+  simplex: SimplexOptions;
   rectangle: Rectangle;
   theme: keyof typeof Themes;
   shape: keyof typeof Shapes;
-  simplex: SimplexOptions;
   window: Dimensions;
-  seed: number;
 };
 
 export type OutputData = {

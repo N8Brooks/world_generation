@@ -1,11 +1,26 @@
 import { MAX_32_BIT_INTEGER } from "./random.ts";
 import { Rectangle } from "./Rectangle.ts";
+import { Shapes } from "./Shapes.ts";
+import { Themes } from "./Themes.ts";
 import { WorkerPool } from "./WorkerPool.ts";
-import { WorldGenerationOptions } from "./WorldGenerationOptions.ts";
 
 const ROWS = 3;
 const COLS = 4;
 const NUM_WORKERS = navigator.hardwareConcurrency || 2;
+
+/** Options available for `WorldGeneration`. */
+export type WorldGenerationOptions = {
+  theme: keyof typeof Themes;
+  shape: keyof typeof Shapes;
+  simplex: SimplexOptions;
+};
+
+export type SimplexOptions = {
+  seed: number;
+  frequency: number;
+  octaves: number;
+  persistance: number;
+};
 
 /** Default options for `WorldGeneration`. */
 const defaultOptions: WorldGenerationOptions = {
@@ -15,6 +30,9 @@ const defaultOptions: WorldGenerationOptions = {
     frequency: 0.002,
     octaves: 5,
     persistance: 0.5,
+    get seed(): number {
+      return Math.floor(Math.random() * MAX_32_BIT_INTEGER);
+    },
   },
 };
 
@@ -57,15 +75,21 @@ export class WorldGeneration extends HTMLElement {
 
   /** Generates image data for the canvas. */
   render() {
-    const seed = Math.trunc(Math.random() * MAX_32_BIT_INTEGER);
+    const {
+      theme,
+      shape,
+      simplex: { seed, ...rest },
+    } = this.options;
     const promises = this.rectangles.map((rectangle) =>
       this.workerPool.addWork({
         rectangle,
-        theme: this.options.theme,
-        shape: this.options.shape,
-        simplex: this.options.simplex,
+        theme,
+        shape,
+        simplex: {
+          seed,
+          ...rest,
+        },
         window: [this.width, this.height],
-        seed,
       })
     );
 

@@ -344,9 +344,9 @@ const Themes = {
     })
 };
 onmessage = function(message) {
-    const { window , theme , seed , rectangle: { width , height , x0 , y0  } , shape: shapeType , simplex: { frequency , octaves , persistance  } ,  } = message.data;
-    let i = 0;
-    const noise2D = makeNoise2D(mulberry32(seed));
+    const { window , theme , rectangle: { width , height , x0 , y0  } , shape: shapeType , simplex: { seed , frequency , octaves , persistance  } ,  } = message.data;
+    const random = mulberry32(seed);
+    const noise2D = makeNoise2D(random);
     setDimensions(window);
     const shape = Shapes[shapeType];
     const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);

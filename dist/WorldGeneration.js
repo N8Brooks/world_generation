@@ -96,7 +96,10 @@ const defaultOptions = {
     simplex: {
         frequency: 0.002,
         octaves: 5,
-        persistance: 0.5
+        persistance: 0.5,
+        get seed () {
+            return Math.floor(Math.random() * MAX_32_BIT_INTEGER);
+        }
     }
 };
 class WorldGeneration1 extends HTMLElement {
@@ -141,17 +144,19 @@ class WorldGeneration1 extends HTMLElement {
         this.render();
     }
     render() {
-        const seed = Math.trunc(Math.random() * MAX_32_BIT_INTEGER);
+        const { theme , shape , simplex: { seed , ...rest } ,  } = this.options;
         const promises = this.rectangles.map((rectangle)=>this.workerPool.addWork({
                 rectangle,
-                theme: this.options.theme,
-                shape: this.options.shape,
-                simplex: this.options.simplex,
+                theme,
+                shape,
+                simplex: {
+                    seed,
+                    ...rest
+                },
                 window: [
                     this.width,
                     this.height
-                ],
-                seed
+                ]
             })
         );
         Promise.all(promises).then((responses)=>{
