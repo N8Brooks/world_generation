@@ -1,19 +1,11 @@
 import { MAX_32_BIT_INTEGER } from "./random.ts";
 import { Tile } from "./Tile.ts";
-import { Shapes } from "./Shapes.ts";
-import { Themes } from "./Themes.ts";
-import { SimplexOptions, WorkerPool } from "./WorkerPool.ts";
+import { WorkerPool } from "./WorkerPool.ts";
+import { WorldGenerationOptions } from "./WorldGenerationOptions.ts";
 
 const ROWS = 3;
 const COLS = 4;
 const NUM_WORKERS = navigator.hardwareConcurrency || 2;
-
-/** Options available for `WorldGeneration`. */
-export type WorldGenerationOptions = {
-  theme: keyof typeof Themes;
-  shape: keyof typeof Shapes;
-  simplex: SimplexOptions;
-};
 
 /** Default options for `WorldGeneration`. */
 const defaultOptions: WorldGenerationOptions = {

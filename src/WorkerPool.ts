@@ -1,21 +1,6 @@
 import { Tile } from "./Tile.ts";
-import { Shapes } from "./Shapes.ts";
 import { Themes } from "./Themes.ts";
-
-/** Settings for simplex noise. */
-export type SimplexOptions = {
-  seed: number;
-  frequency: number;
-  octaves: number;
-  persistance: number;
-};
-
-/** Shape type for land with the coordinates of the center of the island. */
-export type ShapeOptions = {
-  name: keyof typeof Shapes;
-  xCenter: number;
-  yCenter: number;
-};
+import { ShapeOptions, SimplexOptions } from "./WorldGenerationOptions.ts";
 
 /** Type of `data` object that a worker receives from main. */
 export type WorkerMessageData = {

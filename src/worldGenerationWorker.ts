@@ -8,6 +8,7 @@ onmessage = function (
   this: Window,
   message: MessageEvent<WorkerMessageData>,
 ): void {
+  // unpack message
   const {
     theme,
     tile: { width, height, x0, y0 },
@@ -32,30 +33,26 @@ onmessage = function (
   const buffer = new Uint32Array(imageData.data.buffer);
 
   // fill matrix
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      buffer[width * y + x] = ensemble(x, y);
-    }
-  }
+  for (let xd = 0; xd < width; xd++) {
+    const x = x0 + xd;
+    for (let yd = 0; yd < height; yd++) {
+      const y = y0 + yd;
 
-  /** Normalized noise with given shape function. */
-  function ensemble(x: number, y: number): number {
-    // float where `0 <= value < 2`
-    const value = noise(x0 + x, y0 + y) - shape(x0 + x, y0 + y) + 1;
-    // integer where `0 <= height < 100`;
-    const height = Math.floor(50 * value);
-    return heightToColor[height];
-  }
+      // generate simplex noise
+      let result = 0, amp = 1, freq = frequency;
+      for (let octave = 0; octave < octaves; octave++) {
+        result += amp * noise2D(x * freq, y * freq);
+        amp *= persistance;
+        freq *= 2;
+      }
+      const noise = (1 + result / totalAmplitude) / 2;
 
-  /** Return simplex noise for coordinate where `0 <= x < 1`. */
-  function noise(x: number, y: number): number {
-    let result = 0, amp = 1, freq = frequency;
-    for (let octave = 0; octave < octaves; octave++) {
-      result += amp * noise2D(x * freq, y * freq);
-      amp *= persistance;
-      freq *= 2;
+      // make color from `0 <= value < 100`
+      const value = noise - shape(x, +y) + 1;
+      const height = Math.floor(50 * value);
+
+      buffer[width * yd + xd] = heightToColor[height];
     }
-    return (1 + result / totalAmplitude) / 2;
   }
 
   postMessage(
