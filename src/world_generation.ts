@@ -1,7 +1,12 @@
 import { MAX_32_BIT_INTEGER } from "./random.ts";
 import { Tile } from "./Tile.ts";
 import { Pool } from "./Pool.ts";
-import { WorldGenerationOptions } from "./world_generation_options.ts";
+import {
+  SimplexOptions,
+  WorldGenerationOptions,
+} from "./world_generation_options.ts";
+import { Themes } from "./Themes.ts";
+import { Shapes } from "./Shapes.ts";
 
 /** Parameter to break screen into grid. */
 const ROWS = 3;
@@ -57,7 +62,7 @@ export class WorldGeneration extends HTMLElement {
     // set up properties
     this.tiles = [...Tile.tessellate([ROWS, COLS], [this.width, this.height])];
     this.pool = new Pool(NUM_WORKERS, "worker.js");
-    this.options = { ...defaultOptions, ...options };
+    this.options = { ...defaultOptions, ...this.urlOptions, ...options };
 
     this.render();
   }
@@ -98,6 +103,31 @@ export class WorldGeneration extends HTMLElement {
       .catch((reason) => {
         console.error(reason);
       });
+  }
+
+  get urlOptions(): Partial<WorldGenerationOptions> {
+    const options: Partial<WorldGenerationOptions> = {};
+    const url = new URL(window.location.toString());
+
+    const theme = url.searchParams.get("theme") ?? "";
+    if (theme in Themes) {
+      options.theme = theme as keyof typeof Themes;
+    }
+
+    const shape = url.searchParams.get("shape") ?? "";
+    if (shape in Shapes) {
+      options.shape = shape as keyof typeof Shapes;
+    }
+
+    options.simplex = { ...defaultOptions.simplex };
+    for (const key of Object.keys(options.simplex)) {
+      const value = parseFloat(url.searchParams.get(key) ?? "");
+      if (!isNaN(value)) {
+        options.simplex[key as keyof SimplexOptions] = value;
+      }
+    }
+
+    return options;
   }
 }
 
