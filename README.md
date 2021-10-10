@@ -1,6 +1,6 @@
 # WorldGeneration
 
-Simplex world generation built with the JavaScript canvas API and Web Workers
+Simplex world generation built with the JavaScript Canvas API and Web Workers
 API.
 
 ## Demo:
