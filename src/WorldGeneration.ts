@@ -1,6 +1,6 @@
 import { MAX_32_BIT_INTEGER } from "./random.ts";
 import { Tile } from "./Tile.ts";
-import { WorkerPool } from "./WorkerPool.ts";
+import { Pool } from "./Pool.ts";
 import { WorldGenerationOptions } from "./WorldGenerationOptions.ts";
 
 const ROWS = 3;
@@ -28,7 +28,7 @@ export class WorldGeneration extends HTMLElement {
   declare height: number;
   declare width: number;
   declare options: WorldGenerationOptions;
-  declare workerPool: WorkerPool;
+  declare pool: Pool;
   declare tiles: Tile[];
 
   /** Adds a canvas with a procedurally generated world. */
@@ -51,7 +51,7 @@ export class WorldGeneration extends HTMLElement {
     shadowRoot.append(this.canvas);
 
     this.tiles = [...Tile.tessellate([ROWS, COLS], [this.width, this.height])];
-    this.workerPool = new WorkerPool(NUM_WORKERS, "worldGenerationWorker.js");
+    this.pool = new Pool(NUM_WORKERS, "worker.js");
 
     this.render();
   }
@@ -71,7 +71,7 @@ export class WorldGeneration extends HTMLElement {
     };
 
     const promises = this.tiles.map((tile) =>
-      this.workerPool.addWork({
+      this.pool.addWork({
         tile,
         theme,
         shape,

@@ -22,10 +22,10 @@ export type Resolve = (value: MainMessageData) => void;
 /** Worker reject function signature. */
 export type Reject = (reason: Event) => void;
 
-/** Type of work given to `WorkerPool`. */
+/** Type of work given to `Pool`. */
 export type Work = [WorkerMessageData, Resolve, Reject];
 
-export class WorkerPool {
+export class Pool {
   idleWorkers: Worker[] = [];
   workQueue: Work[] = [];
   workerMap: Map<Worker, [Resolve, Reject]> = new Map();

@@ -28,7 +28,7 @@ class Tile {
         }
     }
 }
-class WorkerPool {
+class Pool {
     idleWorkers = [];
     workQueue = [];
     workerMap = new Map();
@@ -108,7 +108,7 @@ class WorldGeneration1 extends HTMLElement {
     height;
     width;
     options;
-    workerPool;
+    pool;
     tiles;
     constructor(options1 = {
     }){
@@ -140,7 +140,7 @@ class WorldGeneration1 extends HTMLElement {
                 this.height
             ])
         ];
-        this.workerPool = new WorkerPool(NUM_WORKERS, "worldGenerationWorker.js");
+        this.pool = new Pool(NUM_WORKERS, "worker.js");
         this.render();
     }
     render() {
@@ -150,7 +150,7 @@ class WorldGeneration1 extends HTMLElement {
             xCenter: Math.floor(this.width / 2),
             yCenter: Math.floor(this.height / 2)
         };
-        const promises = this.tiles.map((tile)=>this.workerPool.addWork({
+        const promises = this.tiles.map((tile)=>this.pool.addWork({
                 tile,
                 theme,
                 shape,

@@ -2,7 +2,7 @@ import { makeNoise2D } from "https://deno.land/x/fast_simplex_noise@v4.0.0/2d.ts
 import { mulberry32 } from "./random.ts";
 import { Shapes } from "./Shapes.ts";
 import { Themes } from "./Themes.ts";
-import { WorkerMessageData } from "./WorkerPool.ts";
+import { WorkerMessageData } from "./Pool.ts";
 
 onmessage = function (
   this: Window,

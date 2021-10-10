@@ -350,24 +350,21 @@ onmessage = function(message) {
     const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);
     const imageData = new ImageData(width, height);
     const buffer = new Uint32Array(imageData.data.buffer);
-    for(let x = 0; x < width; x++){
-        for(let y = 0; y < height; y++){
-            buffer[width * y + x] = ensemble(x, y);
+    for(let xd = 0; xd < width; xd++){
+        const x = x0 + xd;
+        for(let yd = 0; yd < height; yd++){
+            const y = y0 + yd;
+            let result = 0, amp = 1, freq = frequency;
+            for(let octave = 0; octave < octaves; octave++){
+                result += amp * noise2D(x * freq, y * freq);
+                amp *= persistance;
+                freq *= 2;
+            }
+            const noise = (1 + result / totalAmplitude) / 2;
+            const value = noise - shape(x, +y) + 1;
+            const height = Math.floor(50 * value);
+            buffer[width * yd + xd] = heightToColor[height];
         }
-    }
-    function ensemble(x, y) {
-        const value = noise(x0 + x, y0 + y) - shape(x0 + x, y0 + y) + 1;
-        const height = Math.floor(50 * value);
-        return heightToColor[height];
-    }
-    function noise(x, y) {
-        let result = 0, amp = 1, freq = frequency;
-        for(let octave = 0; octave < octaves; octave++){
-            result += amp * noise2D(x * freq, y * freq);
-            amp *= persistance;
-            freq *= 2;
-        }
-        return (1 + result / totalAmplitude) / 2;
     }
     postMessage({
         tile: message.data.tile,
