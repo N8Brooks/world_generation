@@ -20,9 +20,7 @@ const defaultOptions: WorldGenerationOptions = {
     frequency: 0.002,
     octaves: 5,
     persistance: 0.5,
-    get seed(): number {
-      return Math.floor(Math.random() * MAX_32_BIT_INTEGER);
-    },
+    seed: NaN,
   },
 };
 
@@ -57,9 +55,9 @@ export class WorldGeneration extends HTMLElement {
     shadowRoot.append(this.canvas);
 
     // set up properties
-    this.options = { ...defaultOptions, ...options };
     this.tiles = [...Tile.tessellate([ROWS, COLS], [this.width, this.height])];
     this.pool = new Pool(NUM_WORKERS, "worker.js");
+    this.options = { ...defaultOptions, ...options };
 
     this.render();
   }
@@ -77,6 +75,10 @@ export class WorldGeneration extends HTMLElement {
       xCenter: Math.floor(this.width / 2),
       yCenter: Math.floor(this.height / 2),
     };
+
+    if (isNaN(simplex.seed)) {
+      simplex.seed = Math.floor(Math.random() * MAX_32_BIT_INTEGER);
+    }
 
     const promises = this.tiles.map((tile) =>
       this.pool.addWork({

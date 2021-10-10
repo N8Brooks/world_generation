@@ -97,9 +97,7 @@ const defaultOptions = {
         frequency: 0.002,
         octaves: 5,
         persistance: 0.5,
-        get seed () {
-            return Math.floor(Math.random() * MAX_32_BIT_INTEGER);
-        }
+        seed: NaN
     }
 };
 class WorldGeneration1 extends HTMLElement {
@@ -127,10 +125,6 @@ class WorldGeneration1 extends HTMLElement {
         this.width = this.canvas.width = window.innerWidth;
         this.height = this.canvas.height = window.innerHeight;
         shadowRoot.append(this.canvas);
-        this.options = {
-            ...defaultOptions,
-            ...options1
-        };
         this.tiles = [
             ...Tile.tessellate([
                 ROWS,
@@ -141,6 +135,10 @@ class WorldGeneration1 extends HTMLElement {
             ])
         ];
         this.pool = new Pool(NUM_WORKERS, "worker.js");
+        this.options = {
+            ...defaultOptions,
+            ...options1
+        };
         this.render();
     }
     render() {
@@ -150,6 +148,9 @@ class WorldGeneration1 extends HTMLElement {
             xCenter: Math.floor(this.width / 2),
             yCenter: Math.floor(this.height / 2)
         };
+        if (isNaN(simplex.seed)) {
+            simplex.seed = Math.floor(Math.random() * MAX_32_BIT_INTEGER);
+        }
         const promises = this.tiles.map((tile)=>this.pool.addWork({
                 tile,
                 theme,
