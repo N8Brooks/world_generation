@@ -55,6 +55,7 @@ export class WorldGeneration extends HTMLElement {
 
   /** Generates image data for the canvas. */
   render() {
+    const seeds = Array.from({ length: 255 }, () => Math.random());
     const promises = this.rectangles.map((rectangle) =>
       this.workerPool.addWork({
         rectangle,
@@ -62,6 +63,7 @@ export class WorldGeneration extends HTMLElement {
         shape: this.options.shape,
         simplex: this.options.simplex,
         window: [this.width, this.height],
+        seeds,
       })
     );
 

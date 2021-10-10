@@ -138,6 +138,10 @@ class WorldGeneration1 extends HTMLElement {
         this.render();
     }
     render() {
+        const seeds = Array.from({
+            length: 255
+        }, ()=>Math.random()
+        );
         const promises = this.rectangles.map((rectangle)=>this.workerPool.addWork({
                 rectangle,
                 theme: this.options.theme,
@@ -146,7 +150,8 @@ class WorldGeneration1 extends HTMLElement {
                 window: [
                     this.width,
                     this.height
-                ]
+                ],
+                seeds
             })
         );
         Promise.all(promises).then((responses)=>{

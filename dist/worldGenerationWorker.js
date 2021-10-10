@@ -334,9 +334,11 @@ const Themes = {
         ]
     })
 };
-const noise2D = makeNoise2D();
 onmessage = function(message) {
-    const { window , theme , rectangle: { width , height  } , shape: shapeType , simplex: { frequency , octaves , persistance  } ,  } = message.data;
+    const { window , theme , seeds , rectangle: { width , height , x0 , y0  } , shape: shapeType , simplex: { frequency , octaves , persistance  } ,  } = message.data;
+    let i = 0;
+    const noise2D = makeNoise2D(()=>seeds[i++]
+    );
     setDimensions(window);
     const shape = Shapes[shapeType];
     const totalAmplitude = 2 - 1 / 2 ** (octaves - 1);
@@ -349,7 +351,7 @@ onmessage = function(message) {
         }
     }
     function ensemble(x, y) {
-        const value = noise(x, y) - shape(x, y) + 1;
+        const value = noise(x0 + x, y0 + y) - shape(x0 + x, y0 + y) + 1;
         const height = Math.floor(50 * value);
         return heightToColor[height];
     }

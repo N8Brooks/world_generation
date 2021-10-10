@@ -9,6 +9,7 @@ export type InputData = {
   shape: keyof typeof Shapes;
   simplex: SimplexOptions;
   window: Dimensions;
+  seeds: number[];
 };
 
 export type OutputData = {

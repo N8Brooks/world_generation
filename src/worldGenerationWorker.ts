@@ -3,16 +3,18 @@ import { setDimensions, Shapes } from "./Shapes.ts";
 import { Themes } from "./Themes.ts";
 import { InputData } from "./WorkerPool.ts";
 
-const noise2D = makeNoise2D();
-
 onmessage = function (this: Window, message: MessageEvent<InputData>): void {
   const {
     window,
     theme,
-    rectangle: { width, height },
+    seeds,
+    rectangle: { width, height, x0, y0 },
     shape: shapeType,
     simplex: { frequency, octaves, persistance },
   } = message.data;
+
+  let i = 0;
+  const noise2D = makeNoise2D(() => seeds[i++]);
 
   setDimensions(window);
   const shape = Shapes[shapeType];
@@ -30,7 +32,7 @@ onmessage = function (this: Window, message: MessageEvent<InputData>): void {
   /** Normalized noise with given shape function. */
   function ensemble(x: number, y: number): number {
     // float where `0 <= value < 2`
-    const value = noise(x, y) - shape(x, y) + 1;
+    const value = noise(x0 + x, y0 + y) - shape(x0 + x, y0 + y) + 1;
     // integer where `0 <= height < 100`;
     const height = Math.floor(50 * value);
     return heightToColor[height];
