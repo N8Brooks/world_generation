@@ -4,7 +4,7 @@ World generation built with vanilla JavaScript.
 
 # Demo:
 
-https://n8brooks.github.io/WorldGeneration/dist/index.html
+https://n8brooks.github.io/world_generation/dist/index.html
 
 # Build Commands:
 
