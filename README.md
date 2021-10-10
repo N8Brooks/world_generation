@@ -11,7 +11,7 @@ https://n8brooks.github.io/world_generation/dist/index.html?theme=atlas&shape=sq
 
 ### Pixel-ey theme
 
-https://n8brooks.github.io/world_generation/dist/index.html?pixels=10
+https://n8brooks.github.io/world_generation/dist/index.html?pixels=5
 
 ### Other options:
 
