@@ -4,3 +4,4 @@ TODO:
 - Clean up project class structures.
 - Find better names for stuff.
 - Add unit tests with deno-dom.
+- Add ability to pixelate images.
