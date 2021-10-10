@@ -8,6 +8,7 @@ export type WorkerMessageData = {
   simplex: SimplexOptions;
   theme: keyof typeof Themes;
   shape: ShapeOptions;
+  pixels: number;
 };
 
 /** Type of `data` object that main receives from workers. */

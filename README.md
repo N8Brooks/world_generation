@@ -5,17 +5,17 @@ API.
 
 ## Demo:
 
-### Pixel theme
-
-https://n8brooks.github.io/world_generation/dist/index.html
-
 ### Atlas theme
 
 https://n8brooks.github.io/world_generation/dist/index.html?theme=atlas&shape=square
 
+### Pixel-ey theme
+
+https://n8brooks.github.io/world_generation/dist/index.html?pixels=10
+
 ### Other options:
 
-- theme: "atlas" | "pixel"
+- theme: "pixel" | "atlas"
 - shape: "circle" | "square" | "flat"
 - seed: integer
 - octaves: integer

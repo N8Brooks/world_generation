@@ -10,6 +10,7 @@ onmessage = function (
 ): void {
   // unpack message
   const {
+    pixels,
     theme,
     tile: { width, height, x0, y0 },
     simplex: { seed, frequency, octaves, persistance },
@@ -34,9 +35,9 @@ onmessage = function (
 
   // fill matrix
   for (let xd = 0; xd < width; xd++) {
-    const x = x0 + xd;
+    let x = x0 + xd - (x0 + xd) % pixels;
     for (let yd = 0; yd < height; yd++) {
-      const y = y0 + yd;
+      const y = y0 + yd - (y0 + yd) % pixels;
 
       // generate simplex noise
       let result = 0, amp = 1, freq = frequency;

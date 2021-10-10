@@ -18,6 +18,7 @@ export type ShapeOptions = {
 
 /** Options available for `WorldGeneration`. */
 export type WorldGenerationOptions = {
+  pixels: number;
   theme: keyof typeof Themes;
   shape: keyof typeof Shapes;
   simplex: SimplexOptions;

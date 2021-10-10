@@ -19,6 +19,7 @@ const NUM_WORKERS = navigator.hardwareConcurrency || 2;
 
 /** Default options for `WorldGeneration`. */
 const defaultOptions: WorldGenerationOptions = {
+  pixels: 1,
   theme: "pixel",
   shape: "circle",
   simplex: {
@@ -70,6 +71,7 @@ export class WorldGeneration extends HTMLElement {
   /** Generates image data for the canvas. */
   render() {
     const {
+      pixels,
       theme,
       shape: name,
       simplex: { ...simplex },
@@ -87,6 +89,7 @@ export class WorldGeneration extends HTMLElement {
 
     const promises = this.tiles.map((tile) =>
       this.pool.addWork({
+        pixels,
         tile,
         theme,
         shape,
@@ -125,6 +128,11 @@ export class WorldGeneration extends HTMLElement {
       if (!isNaN(value)) {
         options.simplex[key as keyof SimplexOptions] = value;
       }
+    }
+
+    const pixels = parseFloat(url.searchParams.get("pixels") ?? "");
+    if (!isNaN(pixels)) {
+      options.pixels = Math.trunc(pixels);
     }
 
     return options;
