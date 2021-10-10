@@ -1,5 +1,5 @@
 import { MAX_32_BIT_INTEGER } from "./random.ts";
-import { Rectangle } from "./Rectangle.ts";
+import { Tile } from "./Tile.ts";
 import { Shapes } from "./Shapes.ts";
 import { Themes } from "./Themes.ts";
 import { WorkerPool } from "./WorkerPool.ts";
@@ -15,6 +15,7 @@ export type WorldGenerationOptions = {
   simplex: SimplexOptions;
 };
 
+/** Settings for simplex noise. */
 export type SimplexOptions = {
   seed: number;
   frequency: number;
@@ -44,7 +45,7 @@ export class WorldGeneration extends HTMLElement {
   declare width: number;
   declare options: WorldGenerationOptions;
   declare workerPool: WorkerPool;
-  declare rectangles: Rectangle[];
+  declare tiles: Tile[];
 
   /** Adds a canvas with a procedurally generated world. */
   constructor(options: Partial<WorldGenerationOptions> = {}) {
@@ -65,9 +66,7 @@ export class WorldGeneration extends HTMLElement {
     this.height = this.canvas.height = window.innerHeight;
     shadowRoot.append(this.canvas);
 
-    this.rectangles = [
-      ...Rectangle.tessellate([ROWS, COLS], [this.width, this.height]),
-    ];
+    this.tiles = [...Tile.tessellate([ROWS, COLS], [this.width, this.height])];
     this.workerPool = new WorkerPool(NUM_WORKERS, "worldGenerationWorker.js");
 
     this.render();
@@ -80,9 +79,9 @@ export class WorldGeneration extends HTMLElement {
       shape,
       simplex: { seed, ...rest },
     } = this.options;
-    const promises = this.rectangles.map((rectangle) =>
+    const promises = this.tiles.map((tile) =>
       this.workerPool.addWork({
-        rectangle,
+        tile,
         theme,
         shape,
         simplex: {
@@ -95,7 +94,7 @@ export class WorldGeneration extends HTMLElement {
 
     Promise.all(promises)
       .then((responses) => {
-        for (const { imageData, rectangle: { x0, y0 } } of responses) {
+        for (const { imageData, tile: { x0, y0 } } of responses) {
           this.context.putImageData(imageData, x0, y0);
         }
       })

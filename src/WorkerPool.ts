@@ -1,18 +1,18 @@
-import { Dimensions, Rectangle } from "./Rectangle.ts";
+import { Dimensions, Tile } from "./Tile.ts";
 import { Shapes } from "./Shapes.ts";
 import { Themes } from "./Themes.ts";
 import { SimplexOptions } from "./WorldGeneration.ts";
 
 export type InputData = {
   simplex: SimplexOptions;
-  rectangle: Rectangle;
+  tile: Tile;
   theme: keyof typeof Themes;
   shape: keyof typeof Shapes;
   window: Dimensions;
 };
 
 export type OutputData = {
-  rectangle: Rectangle;
+  tile: Tile;
   imageData: ImageData;
 };
 

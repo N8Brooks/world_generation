@@ -1,5 +1,5 @@
 const MAX_32_BIT_INTEGER = 2 ** 32;
-class Rectangle {
+class Tile {
     x0;
     y0;
     width;
@@ -17,7 +17,7 @@ class Rectangle {
             const tileHeight = row < rows - 1 ? rowHeight : height - rowHeight * (rows - 1);
             for(let col = 0; col < cols; col++){
                 const tileWidth = col < cols - 1 ? columnWidth : width - columnWidth * (cols - 1);
-                yield new Rectangle([
+                yield new Tile([
                     col * columnWidth,
                     row * rowHeight
                 ], [
@@ -109,7 +109,7 @@ class WorldGeneration1 extends HTMLElement {
     width;
     options;
     workerPool;
-    rectangles;
+    tiles;
     constructor(options1 = {
     }){
         super();
@@ -131,22 +131,22 @@ class WorldGeneration1 extends HTMLElement {
         this.width = this.canvas.width = window.innerWidth;
         this.height = this.canvas.height = window.innerHeight;
         shadowRoot.append(this.canvas);
-        this.rectangles = [
-            ...Rectangle.tessellate([
+        this.tiles = [
+            ...Tile.tessellate([
                 ROWS,
                 COLS
             ], [
                 this.width,
                 this.height
-            ]), 
+            ])
         ];
         this.workerPool = new WorkerPool(NUM_WORKERS, "worldGenerationWorker.js");
         this.render();
     }
     render() {
         const { theme , shape , simplex: { seed , ...rest } ,  } = this.options;
-        const promises = this.rectangles.map((rectangle)=>this.workerPool.addWork({
-                rectangle,
+        const promises = this.tiles.map((tile)=>this.workerPool.addWork({
+                tile,
                 theme,
                 shape,
                 simplex: {
@@ -160,7 +160,7 @@ class WorldGeneration1 extends HTMLElement {
             })
         );
         Promise.all(promises).then((responses)=>{
-            for (const { imageData , rectangle: { x0 , y0  }  } of responses){
+            for (const { imageData , tile: { x0 , y0  }  } of responses){
                 this.context.putImageData(imageData, x0, y0);
             }
         }).catch((reason)=>{

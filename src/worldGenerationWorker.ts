@@ -8,7 +8,7 @@ onmessage = function (this: Window, message: MessageEvent<InputData>): void {
   const {
     window,
     theme,
-    rectangle: { width, height, x0, y0 },
+    tile: { width, height, x0, y0 },
     shape: shapeType,
     simplex: { seed, frequency, octaves, persistance },
   } = message.data;
@@ -50,7 +50,7 @@ onmessage = function (this: Window, message: MessageEvent<InputData>): void {
   }
 
   postMessage(
-    { rectangle: message.data.rectangle, imageData },
+    { tile: message.data.tile, imageData },
     [imageData.data.buffer] as WindowPostMessageOptions,
   );
 };

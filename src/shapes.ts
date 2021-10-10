@@ -1,4 +1,4 @@
-import { Dimensions } from "./Rectangle.ts";
+import { Dimensions } from "./Tile.ts";
 
 export type Shape = (x: number, y: number) => number;
 

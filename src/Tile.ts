@@ -3,7 +3,7 @@ export type Point = [number, number];
 export type Dimensions = [number, number];
 
 /** Represents a rectangle starting at `coordinate` that is the size of `dimensions`. */
-export class Rectangle {
+export class Tile {
   declare x0: number;
   declare y0: number;
   declare width: number;
@@ -16,7 +16,7 @@ export class Rectangle {
     this.height = height;
   }
 
-  /** Divides a `width` by `height` rectangle into `rows * cols` rectangles. */
+  /** Divides a `width` by `height` tile into `rows * cols` tiles. */
   static *tessellate([rows, cols]: Dimensions, [width, height]: Dimensions) {
     const columnWidth = Math.ceil(width / cols);
     const rowHeight = Math.ceil(height / rows);
@@ -30,7 +30,7 @@ export class Rectangle {
           ? columnWidth
           : width - columnWidth * (cols - 1);
 
-        yield new Rectangle(
+        yield new Tile(
           [col * columnWidth, row * rowHeight],
           [tileWidth, tileHeight],
         );

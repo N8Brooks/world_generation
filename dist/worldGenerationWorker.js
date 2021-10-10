@@ -344,7 +344,7 @@ const Themes = {
     })
 };
 onmessage = function(message) {
-    const { window , theme , rectangle: { width , height , x0 , y0  } , shape: shapeType , simplex: { seed , frequency , octaves , persistance  } ,  } = message.data;
+    const { window , theme , tile: { width , height , x0 , y0  } , shape: shapeType , simplex: { seed , frequency , octaves , persistance  } ,  } = message.data;
     const random = mulberry32(seed);
     const noise2D = makeNoise2D(random);
     setDimensions(window);
@@ -373,7 +373,7 @@ onmessage = function(message) {
         return (1 + result / totalAmplitude) / 2;
     }
     postMessage({
-        rectangle: message.data.rectangle,
+        tile: message.data.tile,
         imageData
     }, [
         imageData.data.buffer
