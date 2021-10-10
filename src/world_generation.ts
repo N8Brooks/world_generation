@@ -132,7 +132,7 @@ export class WorldGeneration extends HTMLElement {
 
     const pixels = parseFloat(url.searchParams.get("pixels") ?? "");
     if (!isNaN(pixels)) {
-      options.pixels = Math.trunc(pixels);
+      options.pixels = pixels;
     }
 
     return options;
