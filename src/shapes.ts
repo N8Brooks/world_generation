@@ -1,11 +1,8 @@
 /** Function signature returned by shape factories. */
 export type Shape = (x: number, y: number) => number;
 
-/** Function signature of shape factories. */
-export type MakeShape = (centerX: number, centerY: number) => Shape;
-
 /** Holds factories to make shapes of land masses. */
-export const Shapes: Record<string, MakeShape> = {
+export const Shapes = {
   /** Returns a function that generates higher number based on their closeness to a wall. */
   square(centerX: number, centerY: number): Shape {
     const maximumDistance = Math.min(centerX, centerY);
