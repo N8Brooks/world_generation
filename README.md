@@ -15,12 +15,12 @@ https://n8brooks.github.io/world_generation/dist/index.html?pixels=10
 
 ### Other options:
 
-- theme: "pixel" | "atlas"
-- shape: "circle" | "square" | "flat"
-- seed: integer
-- octaves: integer
-- frequency: float
-- persistance: float
+- theme: "pixel" | "atlas" (default is "pixel")
+- shape: "circle" | "square" | "flat" (default is "circle")
+- seed: integer (default is Math.random() * 2**32)
+- octaves: integer (default is 5)
+- frequency: float (default is 0.002)
+- persistance: float (default is 0.5)
 
 ## Build Commands:
 
