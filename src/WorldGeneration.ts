@@ -1,5 +1,4 @@
 import { Rectangle } from "./Rectangle.ts";
-import { Themes } from "./Themes.ts";
 import { WorkerPool } from "./WorkerPool.ts";
 import { WorldGenerationOptions } from "./WorldGenerationOptions.ts";
 
